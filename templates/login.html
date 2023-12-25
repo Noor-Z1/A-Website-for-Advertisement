@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel = 'stylesheet' type="text/css" href="../static/style.css">
+</head>
+<body>
+    {% if username and password%}
+<!--  Home Page | My Advertisements | My Profile | Logout  -->
+        <p></p>
+    {% else %}
+    <form action="/login" method="POST">
+            <p>Username: <input type="text" name="username"></p>
+            <p>Password: <input type="password" name="password"></p>
+            <p><input type="submit" value="Login"></p>
+    </form>
+
+        {% if username and not password %}
+            <!-- Display an error message for missing password -->
+            <p>Please enter a password.</p>
+        {% elif password and not username %}
+            <!-- Display an error message for missing username -->
+            <p>Please enter a username.</p>
+        {% elif not username and not password %}
+            <!-- Display an error message for both missing username and password -->
+            <p>Please enter both username and password.</p>
+        {% endif %}
+    {% endif %}
+</body>
+</html>
