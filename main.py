@@ -20,9 +20,11 @@ def register():
         tel = request.form["Telephone number"]
 
         # to be completed: Update database
-        # conn = sqlite3.connect("adv.db")
-        # c = conn.cursor()
-
+        conn = sqlite3.connect("adv.db")
+        c = conn.cursor()
+        c.execute("INSERT INTO User VALUES(?,?,?,?,?)",(username, password, fullname, email, tel))
+        conn.commit()
+        conn.close()
         return redirect(url_for('register_success'))
     else:
         return render_template('register.html')
@@ -31,8 +33,13 @@ def register():
 def register_success():
     return render_template('register_success.html')
 
-
-@app.route("/login", methods=["POST"])
+@app.route("/loginform")
+def index():
+    if "username" in session: # dictionary in python flask, username as a key in this dict
+        return render_template("login.html", username=session["username"]) # if username available: send username to the index.html
+    else:
+        return render_template("login.html")
+@app.route("/login", methods=['GET', 'POST'])
 def login():
     if request.method == "POST":
         username = request.form["username"]
@@ -46,14 +53,10 @@ def login():
         row = c.fetchone()
         conn.close()
 
-
-        if row != None:
+        if row is not None:
             # if the username exists in our db
             session["username"] = username
-
-        return redirect(url_for('login'))
-        # go to login function
-
+        return redirect(url_for('loginform'))
     else: # skip this part (GET method)
         pass
 @app.route('/logout')
