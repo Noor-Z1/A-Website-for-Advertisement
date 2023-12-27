@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Advertisement</title>
+</head>
+<body>
+<h2>Add new advertisement</h2>
+    <form action="/manageAdv">
+        <p>Title: <input type="text" name="title"></p>
+        <p>Description: <input type="text" name="description"></p>
+<!--        <p>Category: <input type="checkbox" name="category"></p>-->
+    </form>
+<h2>Previous advertisement</h2>
+    <form action="/display">
+        <table border="1">
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Activate/Deactivate</th>
+        </tr>
+        {% for title description category isActive %}
+            <tr>
+            <td>{{title}}</td>
+            <td>{{description}}</td>
+            <td>{{category}}</td>
+            <td><a>{{isActive}}</a></td>
+        </tr>
+        {% end-for %}
+    </table>
+    </form>
+</body>
+</html>

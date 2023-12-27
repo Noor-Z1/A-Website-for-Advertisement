@@ -1,5 +1,6 @@
 import sqlite3
 
+
 def createTable(dbname):
     conn = sqlite3.connect(dbname)
     c = conn.cursor()
@@ -21,13 +22,14 @@ def createTable(dbname):
               "title TEXT,"
               "description TEXT,"
               "isactive INTEGER,"
-              "make TEXT,"
-              "belongto INTEGER,"
-              "FOREIGN KEY (make) REFERENCES User(username),"
-              "FOREIGN KEY (belongto) REFERENCES Category(cid))")
+              "username TEXT,"
+              "category INTEGER,"
+              "FOREIGN KEY (username) REFERENCES User(username),"
+              "FOREIGN KEY (category) REFERENCES Category(cid))")
 
     conn.commit()
     conn.close()
+
 
 def insert(dbname):
     conn = sqlite3.connect(dbname)
@@ -36,6 +38,7 @@ def insert(dbname):
     c.executemany("INSERT INTO Category VALUES(?,?)", category)
     conn.commit()
     conn.close()
+
 
 if __name__ == '__main__':
     createTable("adv.db")
