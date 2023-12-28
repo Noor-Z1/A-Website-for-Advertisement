@@ -5,14 +5,16 @@
     <title>My Advertisement</title>
 </head>
 <body>
+<!--reminder: merge two forms into one-->
 <h2>Add new advertisement</h2>
-    <form action="/manageAdv">
+    <form action="/advertisement">
         <p>Title: <input type="text" name="title"></p>
         <p>Description: <input type="text" name="description"></p>
+        <p><input type="submit" name="Add advertisement"></p>
 <!--        <p>Category: <input type="checkbox" name="category"></p>-->
     </form>
-<h2>Previous advertisement</h2>
-    <form action="/display">
+<h2>Previous advertisements</h2>
+        <form action="/advertisement" method="POST">
         <table border="1">
         <tr>
             <th>Title</th>
@@ -20,15 +22,18 @@
             <th>Category</th>
             <th>Activate/Deactivate</th>
         </tr>
-        {% for title description category isActive %}
+<!--      {% if records %}-->
+        {% for record in records %}
             <tr>
-            <td>{{title}}</td>
-            <td>{{description}}</td>
-            <td>{{category}}</td>
-            <td><a>{{isActive}}</a></td>
+            <td>{{record[0]}}</td>
+            <td>{{record[1]}}</td>
+            <td>{{record[2]}}</td>
+            <td>{{record[3]}}</td>
         </tr>
-        {% end-for %}
+        {% endfor %}
+<!--      {% endif %}-->
     </table>
     </form>
+
 </body>
 </html>

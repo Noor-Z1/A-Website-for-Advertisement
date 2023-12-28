@@ -47,7 +47,7 @@ def loginform():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-    if request.method == "POST":
+    if request.method == "POST" and "username" not in session:
         username = request.form["username"]
         password = request.form["password"]
 
@@ -63,38 +63,71 @@ def login():
             # if the username exists in our db
             session["username"] = username
         return redirect(url_for('loginform'))
-    else: # skip this part (GET method)
-        pass
+    elif 'username' in session:
+        # Check which page the user should be redirected to based on session information
+        if request.path == '/':
+            return redirect(url_for('home'))
+        elif request.path == '/advertisement':
+            return redirect(url_for('advertisement'))
+        elif request.path == '/profile':
+            return redirect(url_for('profile'))
+        elif request.path == '/logout':
+            return redirect(url_for('logout'))
+
+#     add if statements for home page, adv page, profile page, logout
 
 
 @app.route('/logout')
 def logout():
     # remove the username from our session
-    session.pop("username", None)
+    session.pop('username', None)
     return redirect(url_for('home'))
 
 
-@app.route('/manageAdv', methods=['GET', 'POST'])
-def manage():
-    title = request.form['title']
-    description = request.form['description']
-    category = request.form['category']
-    conn = sqlite3.connect("adv.db")
-    c = conn.cursor()
-    c.execute("INSERT INTO Advertisement(title, description, isactive, username, category) "
-              "VALUES(?,?,?,?,?) ", (title, description, 1, session["username"], category))
-    conn.commit()
-    conn.close()
-
-
-@app.get('/display')
+@app.route('/display')
 def display():
-    conn = sqlite3.connect("adv.db")
-    c = conn.cursor()
-    c.execute("SELECT * FORM Advertisement WHERE username=? ", (session["username"],))
-    conn.commit()
-    row = c.fetchone()
-    conn.close()
+    return render_template('advertisement.html')
+
+@app.route('/advertisement', methods=['GET', 'POST']) # to be completed: send categories for checkbox
+def advertisement():
+    if "username" in session:
+        conn = sqlite3.connect("adv.db")
+        c = conn.cursor()
+        c.execute("SELECT title, description, category, isactive  FROM Advertisement WHERE username=?",
+                  (session["username"],))
+        conn.commit()
+        records = c.fetchall()
+        conn.close()
+        return render_template("advertisement.html", records=records)
+    if request.method == 'POST' and "username" in session:
+        title = request.form['title']
+        description = request.form['description']
+        category = request.form['category']
+        conn = sqlite3.connect("adv.db")
+        c = conn.cursor()
+        # setting the isactive as 1 which means it is active by default
+        # to be completed for category
+        c.execute("INSERT INTO Advertisement(title, description, isactive, username) "
+                  "VALUES(?,?,?,?) ", (title, description, 1, session["username"]))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('display'))
+    return redirect(url_for('/display'))
+
+# @app.route('/advertisement')
+# @app.get('/display')
+# def display():
+#     if "username" in session:
+#         conn = sqlite3.connect("adv.db")
+#         c = conn.cursor()
+#         c.execute("SELECT title, description, category, isactive  FROM Advertisement WHERE username=?",
+#                   (session["username"],))
+#         conn.commit()
+#         records = c.fetchall()
+#         conn.close()
+#         return render_template("advertisement.html", records=records)
+#     else:
+#         return render_template('advertisement.html')
 
 
 if __name__ == '__main__':

@@ -16,10 +16,10 @@
 <body>
     {% if username %}
 <!--  Home Page | My Advertisements | My Profile | Logout  -->
-        <p><a href="home.html">Home Page</a> |
-        <a href="advertisement.html">My Advertisement</a> |
-        <a href="profile.html">My Profile</a> |
-        <a href="home.html">Logout</a>
+        <p><a href="/home">Home Page</a> |
+        <a href="/advertisement">My Advertisement</a> |
+        <a href="/profile">My Profile</a> |
+        <a href="/">Logout</a>
     {% else %}
     <form action="/login" method="POST">
             <p>Username: <input type="text" name="username"></p>
