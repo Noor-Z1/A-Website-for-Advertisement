@@ -1,2 +1,2 @@
-# A-Website-for-Advertisement---Python
+# A Website for Advertisement developed with Python Flask
 Flask version 3.0.0
