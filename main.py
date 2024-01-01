@@ -159,7 +159,7 @@ def advertisement():
     if request.method == 'POST':
         title = request.form['title']
         description = request.form['description']
-        # category = request.form['category']
+        category = request.form['category']   # this will give you the category id
         conn = sqlite3.connect("adv.db")
         c = conn.cursor()
         # setting the isactive as 1 which means it is active by default
