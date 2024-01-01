@@ -28,7 +28,11 @@
             <td>{{record[0]}}</td>
             <td>{{record[1]}}</td>
             <td>{{record[2]}}</td>
-            <td>{{record[3]}}</td>
+            {% if record[3] == 1 %}
+            <td><a href="/deactivate">Deactivate</a></td>
+            {% else %}
+           <td><a href="/activate">Activate</a></td>
+                {% endif %}
         </tr>
         {% endfor %}
 <!--      {% endif %}-->

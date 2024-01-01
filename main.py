@@ -74,8 +74,6 @@ def showadvertisements():
     else:
         c.execute("SELECT * FROM Advertisement")
         allData = c.fetchall()
-
-
     newlist = []
 
     for row in allData:
@@ -127,8 +125,6 @@ def login():
             return redirect(url_for('logout'))
 
 
-#     add if statements for home page, adv page, profile page, logout
-
 
 @app.route('/logout')
 def logout():
@@ -137,22 +133,27 @@ def logout():
     return redirect(url_for('home'))
 
 
-@app.route('/display')
-def display():
-    return render_template('advertisement.html')
-
+"""
+THIS IS REDUNDANT I THINK
+"""
+# @app.route('/display')
+# def display():
+#     return render_template('advertisement.html')
 
 @app.route('/advertisement', methods=['GET', 'POST'])  # to be completed: send categories for checkbox
 def advertisement():
-    if "username" in session:
-        conn = sqlite3.connect("adv.db")
-        c = conn.cursor()
-        c.execute("SELECT title, description, category, isactive  FROM Advertisement WHERE username=?",
-                  (session["username"],))
-        conn.commit()
-        records = c.fetchall()
-        conn.close()
-        return render_template("advertisement.html", records=records)
+
+    # I COMMENTED somethings AND ONE RETURN IS ENOUGH HERE
+
+    # if "username" in session:  # username should be in the session because this page is way after login
+    conn = sqlite3.connect("adv.db")
+    c = conn.cursor()
+    c.execute("SELECT title, description, category, isactive  FROM Advertisement WHERE username=?",
+              (session["username"],))
+    conn.commit()
+    records = c.fetchall()
+    conn.close()
+    #     return render_template("advertisement.html", records=records)
     if request.method == 'POST':
         title = request.form['title']
         description = request.form['description']
@@ -160,13 +161,14 @@ def advertisement():
         conn = sqlite3.connect("adv.db")
         c = conn.cursor()
         # setting the isactive as 1 which means it is active by default
-        # to be completed for category
+        # to be completed for category -> right now assigning category as 1
+        # Shemin needs to change it
         c.execute("INSERT INTO Advertisement(title, description, isactive, username,category) "
                   "VALUES(?,?,?,?,?) ", (title, description, 1, session["username"], 1))
         conn.commit()
         conn.close()
 
-    return redirect(url_for('/display'))
+    return render_template('advertisement.html', records=records)
 
 
 # @app.route('/advertisement')
