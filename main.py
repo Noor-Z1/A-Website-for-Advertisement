@@ -150,8 +150,10 @@ def advertisement():
     c = conn.cursor()
     c.execute("SELECT title, description, category, isactive  FROM Advertisement WHERE username=?",
               (session["username"],))
-    conn.commit()
     records = c.fetchall()
+
+    c.execute("Select * from Category")
+    categories = c.fetchall()
     conn.close()
     #     return render_template("advertisement.html", records=records)
     if request.method == 'POST':
@@ -168,7 +170,7 @@ def advertisement():
         conn.commit()
         conn.close()
 
-    return render_template('advertisement.html', records=records)
+    return render_template('advertisement.html', categories= categories, records=records)
 
 
 # @app.route('/advertisement')
