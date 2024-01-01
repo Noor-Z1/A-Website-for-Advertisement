@@ -5,11 +5,8 @@
     <title>Title</title>
     <link rel = 'stylesheet' type="text/css" href="../static/style.css">
     <script>
-<!--not sure if here or in main flask-->
         function validate()
-        {
-        // validation of password
-        // validation of username
+        {  // is it needed here??
         }
     </script>
 </head>
@@ -19,14 +16,33 @@
         <p><a href="/home">Home Page</a> |
         <a href="/advertisement">My Advertisement</a> |
         <a href="/profile">My Profile</a> |
-        <a href="/">Logout</a>
-    {% else %}
-    <form action="/login" method="POST">
-            <p>Username: <input type="text" name="username"></p>
-            <p>Password: <input type="password" name="password"></p>
-            <p><input type="submit" value="Login"></p>
-    </form>
+            <a href="/">Logout</a> </p>
 
+        <form action="/showadvertisements" method="POST">
+        <p>Search for active advertisements
+        <input type="text" name='search' required="required"></p>
+          <label for="category">Choose a category:</label>
+          <select name="category" id="category">
+              {% for category in categories %}
+              <option value="{{category[0]}}">{{ category[1] }}</option>
+              {% endfor %}
+              <option value="all">All</option>
+          </select>
+          <br><br>
+          <input type="submit" value="Submit">
+        </form>
+
+    {% else %}
+    <form action="/login" method="POST" >
+           <!-- ADDED REQUIRED HERE HOW HOCAM SHOWED IN CLASS BUT NOT SURE IF INSTEAD JAVASCRIPT VALIDATION NEEDED? -->
+            <p>Username: <input type="text" name="username" required="required"></p>
+            <p>Password: <input type="password" name="pwd" required="required"></p>
+            <p><input type="submit" value="Login"></p>
+             {% if msg %}
+             <p style="color: red;">{{ msg }}</p>
+             {% endif %}
+    </form>
+    {% endif %}
 <!--        {% if username and not password %}-->
 <!--            &lt;!&ndash; Display an error message for missing password &ndash;&gt;-->
 <!--            <p>Please enter a password.</p>-->
@@ -37,6 +53,5 @@
 <!--            &lt;!&ndash; Display an error message for both missing username and password &ndash;&gt;-->
 <!--            <p>Please enter both username and password.</p>-->
 <!--        {% endif %}-->
-    {% endif %}
 </body>
 </html>
