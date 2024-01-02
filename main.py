@@ -61,9 +61,9 @@ def showadvertisements():
 
     conn = sqlite3.connect("adv.db")
     c = conn.cursor()
+    c.execute("SELECT cname from CATEGORY where cid = ?", selected)
+    category_name = c.fetchone()[0]    # extracting the name from the tuple
 
-    print(selected)
-    print(keyword)
     if selected != "all":
         # search for a match The advertisement whose titles, descriptions or contact full name includes at least one of the
         # keywords will be listed. Please note that it does not have to be a full match, so if the keyword is
@@ -74,23 +74,33 @@ def showadvertisements():
     else:
         c.execute("SELECT * FROM Advertisement")
         allData = c.fetchall()
-    newlist = []
 
+    filtered = []
     for row in allData:
         # Create a regular expression pattern for the keyword
         pattern = re.compile(keyword, re.IGNORECASE)
         # Check if the pattern matches any part of the advertisement
         if pattern.search(row[1]) or pattern.search(row[2]) or pattern.search(row[4]):
-            newlist.append(row)
+           filtered.append(row)
 
-    if selected!="all":
-        list2 = None
-    else:
-        list2 = newlist
+    msg = ""
+    if filtered == []:
+        msg = "No advertisement found!"
 
-    print(allData)
     conn.close()
-    return render_template("search.html", data=newlist, all=list2)
+
+    # might add another return for the case where all categories are selected! or find a better way
+    return render_template("search.html", type=category_name, data=filtered, msg= msg)
+
+
+
+# TO DO : NOOR
+@app.route("/SeeMore<id>")
+def showMore(id):
+    aid = id
+    pass
+
+
 
 
 @app.route("/login", methods=['GET', 'POST'])
