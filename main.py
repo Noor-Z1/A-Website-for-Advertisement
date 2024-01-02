@@ -79,8 +79,8 @@ def showadvertisements():
     for row in allData:
         # Create a regular expression pattern for the keyword
         pattern = re.compile(keyword, re.IGNORECASE)
-        # Check if the pattern matches any part of the advertisement
-        if pattern.search(row[1]) or pattern.search(row[2]) or pattern.search(row[4]):
+        # Check if the pattern matches any part of AN ACTIVE advertisement
+        if (pattern.search(row[1]) or pattern.search(row[2]) or pattern.search(row[4])) and row[3]:
            filtered.append(row)
 
     msg = ""
