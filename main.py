@@ -93,14 +93,20 @@ def showadvertisements():
     return render_template("search.html", type=category_name, data=filtered, msg= msg)
 
 
-
-# TO DO : NOOR
-@app.route("/SeeMore<id>")
+@app.route("/SeeMore/<id>")
 def showMore(id):
     aid = id
-    pass
 
+    conn = sqlite3.connect("adv.db")
+    c = conn.cursor()
+    c.execute("SELECT * from Advertisement where aid = ?", aid)
+    row = c.fetchall()
+    uname= row[0][4]
 
+    c.execute("SELECT fullname, email, telno from User WHERE username = ?", (uname,))
+    contact = c.fetchall()
+    c.close()
+    return render_template("details.html", adData=row[0], contactData=contact[0])
 
 
 @app.route("/login", methods=['GET', 'POST'])
