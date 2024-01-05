@@ -2,14 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>My Profile</title>
+    <title>Title</title>
+    <link rel = 'stylesheet' type="text/css" href="../static/style.css">
+    <script type = "text/javascript" src="/static/script.js"></script>
 </head>
 <body>
-    <form action="/login" method="POST" >
-            <p>Username: <input type="text" name="username" required="required"></p>
-            <p>Password: <input type="password" name="pwd" required="required"></p>
-            <p><input type="submit" value="Save Changes"></p>
-
-    </form>
+      <h1>Edit profile details</h1>
+      <form action="/editprofile" method="POST" onsubmit="return validate({{ unames }});">
+          <p>Username: <input type="text" name="username" value="{{ details[0] }}" required="required"></p>
+          <p>Password: <input type="password" name="pwd" value ="{{ details[1] }}"  required="required"></p>
+          <p>Full name: <input type="text" name="Full name" value="{{ details[2] }}" required="required"></p>
+          <p>Email address: <input type="email" name="Email address" value="{{ details[3] }}" required="required"></p>
+          <p>Telephone number: <input type="tel" name="Telephone number" value="{{ details[4] }}" required="required"></p>
+          <p><input type="submit" value="Update"></p>
+          <p id="msg"></p>
+      </form>
 </body>
 </html>
