@@ -8,15 +8,15 @@
 <!--reminder: merge two forms into one-->
 <h2>Add new advertisement</h2>
     <form action="/advertisement" method="POST">
-        <p>Title: <input type="text" name="title"></p>
-        <p>Description: <input type="text" name="description"></p>
+        <p>Title: <input type="text" name="title" required="required"></p>
+        <p>Description: <input type="text" name="description" required="required"></p>
         <p>Category:
         <select name="category" id="category">
               {% for category in categories %}
               <option value="{{category[0]}}">{{ category[1] }}</option>
               {% endfor %}
           </select></p>
-        <p><input type="submit" name="Add advertisement"></p>
+        <p><input type="submit" name="Add advertisement" ></p>
     </form>
 <h2>Previous advertisements</h2>
         <form action="/advertisement" method="POST">
@@ -27,22 +27,18 @@
             <th>Category</th>
             <th>Activate/Deactivate</th>
         </tr>
-<!--      {% if records %}-->
         {% for record in records %}
             <tr>
-            <td>{{record[0]}}</td>
             <td>{{record[1]}}</td>
             <td>{{record[2]}}</td>
-            {% if record[3] == 1 %}
-                <!-- you want to toggle these through python flask so when activate is clicked, it should toggle to
-                deactivate and vice versa-->
-            <td><a href="/deactivate">Deactivate</a></td>
+            <td>{{record[3]}}</td>
+            {% if record[4] == 1 %}
+            <td><a href="/deactivate?id={{record[0]}}">Deactivate</a></td>
             {% else %}
-           <td><a href="/activate">Activate</a></td>
+           <td><a href="/activate?id={{record[0]}}">Activate</a></td>
             {% endif %}
         </tr>
         {% endfor %}
-<!--      {% endif %}-->
     </table>
     </form>
 

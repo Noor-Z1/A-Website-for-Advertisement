@@ -18,7 +18,7 @@ def home():
 def register():
     if request.method == 'POST':
         username = request.form["username"]
-        password = request.form["password"]
+        password = request.form["pwd"]
         fullname = request.form["Full name"]
         email = request.form["Email address"]
         tel = request.form["Telephone number"]
@@ -29,17 +29,20 @@ def register():
                   (username, password, fullname, email, tel))
         conn.commit()
         conn.close()
-
         return redirect(url_for('register_success'))
     else:
-        return render_template('register.html')
+        conn = sqlite3.connect("adv.db")
+        c = conn.cursor()
+        c.execute("SELECT username FROM User")
+        names = c.fetchall()
+        names = [name[0] for name in names]
+        conn.close()
+        return render_template('register.html', unames=names)
 
 
 @app.route("/register_success")
 def register_success():
     return render_template('register_success.html')
-
-
 
 @app.post("/showadvertisements")
 def showadvertisements():
@@ -97,7 +100,6 @@ def showadvertisements():
     if selected != "all":
         return render_template("home.html", data=allData, msg=msg, type=category_name, categories=categories, session=session)
     else:
-        # might add another return for the case where all categories are selected! or find a better way
         return render_template("home.html", data_dict=mydict, msg=msg, categories=categories, session=session)
 
 
@@ -136,7 +138,6 @@ def login():
         row = c.fetchone()
         conn.close()
 
-        print(row)
         if row is not None:
             # if the username exists in our db
             session["username"] = username
@@ -152,68 +153,99 @@ def login():
         return render_template('home.html', session=session, categories=categories)
 
 
-
 @app.route('/logout')
 def logout():
     # remove the username from our session
     session.pop('username', None)
     return redirect(url_for('home'))
 
-
-"""
-THIS IS REDUNDANT I THINK
-"""
-# @app.route('/display')
-# def display():
-#     return render_template('advertisement.html')
-
-@app.route('/advertisement', methods=['GET', 'POST'])  # to be completed: send categories for checkbox
+@app.route('/advertisement', methods=['GET', 'POST'])
 def advertisement():
-
-    # I COMMENTED somethings AND ONE RETURN IS ENOUGH HERE
-
-    # if "username" in session:  # username should be in the session because this page is way after login
+    # establish database connection
     conn = sqlite3.connect("adv.db")
     c = conn.cursor()
-    c.execute("SELECT title, description, category, isactive  FROM Advertisement WHERE username=?",
+
+    # fetch these for displaying the current records
+    c.execute("SELECT aid, title, description, category, isactive  FROM Advertisement WHERE username=?",
               (session["username"],))
     records = c.fetchall()
 
+    # need to display categories in a combo box so need to send these
     c.execute("Select * from Category")
     categories = c.fetchall()
     conn.close()
-    #     return render_template("advertisement.html", records=records)
+
     if request.method == 'POST':
         title = request.form['title']
         description = request.form['description']
         category = request.form['category']   # this will give you the category id
         conn = sqlite3.connect("adv.db")
         c = conn.cursor()
+
         # setting the isactive as 1 which means it is active by default
-        # to be completed for category -> right now assigning category as 1
-        # Shemin needs to change it
+        # it autoincremenets the aid when inserting
         c.execute("INSERT INTO Advertisement(title, description, isactive, username,category) "
-                  "VALUES(?,?,?,?,?) ", (title, description, 1, session["username"], 1))
+                  "VALUES(?,?,?,?,?) ", (title, description, 1, session["username"], category))
         conn.commit()
+
+        # get updated records after inserting
+        c.execute("SELECT aid, title, description, category, isactive  FROM Advertisement WHERE username=?", (session["username"],))
+        records = c.fetchall()
         conn.close()
 
     return render_template('advertisement.html', categories= categories, records=records)
 
 
-# @app.route('/advertisement')
-# @app.get('/display')
-# def display():
-#     if "username" in session:
-#         conn = sqlite3.connect("adv.db")
-#         c = conn.cursor()
-#         c.execute("SELECT title, description, category, isactive  FROM Advertisement WHERE username=?",
-#                   (session["username"],))
-#         conn.commit()
-#         records = c.fetchall()
-#         conn.close()
-#         return render_template("advertisement.html", records=records)
-#     else:
-#         return render_template('advertisement.html')
+@app.get('/activate')
+@app.get('/deactivate')
+def toggle():
+
+    # get the id of the advertisement to be updated
+    id = request.args.get('id')
+    # establish database connection to update the status of the record
+    conn = sqlite3.connect("adv.db")
+    c = conn.cursor()
+
+    if "deactivate" in request.url:
+        c.execute("UPDATE Advertisement SET isactive=0 WHERE aid=?", (id,))
+    else:
+        c.execute("UPDATE Advertisement SET isactive=1 WHERE aid=?", (id,))
+
+    conn.commit()
+    conn.close()
+
+    # redirect to advertisement page to refresh it with updated status of the advertisement
+    return redirect(url_for('advertisement'))
+
+
+@app.route('/loadprofile')
+def loadprofile():
+    conn = sqlite3.connect("adv.db")
+    c = conn.cursor()
+    c.execute("SELECT * FROM User WHERE username = ?", (session["username"],))
+    profile = c.fetchall()
+    conn.close()
+    return render_template('profile.html',  details=profile[0])
+
+@app.post("/editprofile")
+def editprofile():
+
+    # update the database with the new details
+    username = request.form["username"]
+    password = request.form["pwd"]
+    fullname = request.form["Full name"]
+    email = request.form["Email address"]
+    tel = request.form["Telephone number"]
+
+    conn = sqlite3.connect("adv.db")
+    c = conn.cursor()
+    c.execute("UPDATE User SET username = ?, password = ?, fullname = ?, email = ?, telno = ? WHERE username = ?",
+              (username, password, fullname, email, tel, session["username"]))
+    conn.commit()
+    conn.close()
+
+    session["username"] = username
+    return redirect(url_for('loadprofile'))
 
 
 if __name__ == '__main__':
