@@ -16,11 +16,11 @@
 <body>
 
     <form action="/register" method="POST">
-        <p>Username: <input type="text" name="username"></p>
-        <p>Password: <input type="password" name="password"></p>
-        <p>Full name: <input type="text" name="Full name"></p>
-        <p>Email address: <input type="email" name="Email address"></p>
-        <p>Telephone number: <input type="tel" name="Telephone number"></p>
+        <p>Username: <input type="text" name="username" required="required"></p>
+        <p>Password: <input type="password" name="password" required="required"></p>
+        <p>Full name: <input type="text" name="Full name" required="required"></p>
+        <p>Email address: <input type="email" name="Email address" required="required"></p>
+        <p>Telephone number: <input type="tel" name="Telephone number" required="required"></p>
         <p id="p1" onsubmit="validate()"><input type="submit" value="Register"></p>
     </form>
 </body>
