@@ -1,0 +1,13 @@
+body{
+    background-color: aliceblue;
+    font-family: "Baskerville Old Face";
+}
+p{
+margin-bottom: 30px;
+}
+input{
+    background-color: whitesmoke;
+}
+h1,h2,p,form{
+    text-align: center;
+}

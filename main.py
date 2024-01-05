@@ -62,7 +62,6 @@ def showadvertisements():
         # "abc", and the title is "xyabcz", then it should be listed as well
         c.execute("SELECT * FROM Advertisement WHERE category = ?", selected)
         allData = c.fetchall()
-        print(allData)
         c.execute("SELECT cname from CATEGORY where cid = ?", selected)
         category_name = c.fetchone()[0]  # extracting the name from the tuple
         filtered = []
@@ -76,6 +75,7 @@ def showadvertisements():
 
         if filtered == [] or allData == []:
             msg = "No advertisement found!"
+        return render_template("home.html", data=allData, msg=msg, type=category_name, categories=categories, session=session)
 
     else:
         c.execute("SELECT * FROM Advertisement")
@@ -96,10 +96,6 @@ def showadvertisements():
                 mydict[name].append(row)
 
         conn.close()
-
-    if selected != "all":
-        return render_template("home.html", data=allData, msg=msg, type=category_name, categories=categories, session=session)
-    else:
         return render_template("home.html", data_dict=mydict, msg=msg, categories=categories, session=session)
 
 

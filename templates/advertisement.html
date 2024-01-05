@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>My Advertisement</title>
+    <link rel = 'stylesheet' type="text/css" href="../static/style.css">
 </head>
 <body>
 <!--reminder: merge two forms into one-->
@@ -16,7 +17,7 @@
               <option value="{{category[0]}}">{{ category[1] }}</option>
               {% endfor %}
           </select></p>
-        <p><input type="submit" name="Add advertisement" ></p>
+        <p><input type="submit" name="Add advertisement" value="Post Advertisement"></p>
     </form>
 <h2>Previous advertisements</h2>
         <form action="/advertisement" method="POST">
