@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Register Page</title>
     <link rel = 'stylesheet' type="text/css" href="/static/style.css">
     <script type = "text/javascript" src="/static/script.js"></script>
 </head>
 <body>
+ <p><a href="/dologin">Back to Home</a></p>
+ <h1>Register</h1>
     <form action="/register" method="POST" onsubmit="return validate({{ unames }});">
         <p>Username: <input id="uname" type="text" name="username" required="required"></p>
         <p>Password: <input id="pass" type="password" name="pwd" required="required"></p>

@@ -1,13 +1,25 @@
 body{
     background-color: aliceblue;
-    font-family: "Baskerville Old Face";
+    font-family: "Arial Narrow";
 }
 p{
-margin-bottom: 30px;
+    margin-bottom: 30px;
+    margin-outside: 20px;
+    text-align: center;
 }
 input{
     background-color: whitesmoke;
 }
-h1,h2,p,form{
+table{
+    margin-left: auto;
+    margin-right: auto;
+
+}
+h1,h2{
     text-align: center;
+}
+
+input {
+      padding: 4px;
+      margin-bottom: 1px;
 }

@@ -6,21 +6,22 @@
     <link rel = 'stylesheet' type="text/css" href="../static/style.css">
 </head>
 <body>
-<!--reminder: merge two forms into one-->
-<h2>Add new advertisement</h2>
+<p><a href="/dologin">Back to Home</a></p>
+
+<h2>Post New Advertisement</h2>
     <form action="/advertisement" method="POST">
-        <p>Title: <input type="text" name="title" required="required"></p>
-        <p>Description: <input type="text" name="description" required="required"></p>
+        <p>Title: <input type="text" name="title" required="required"/></p>
+        <p>Description: <input type="text" name="description" required="required"/></p>
         <p>Category:
         <select name="category" id="category">
               {% for category in categories %}
               <option value="{{category[0]}}">{{ category[1] }}</option>
               {% endfor %}
           </select></p>
-        <p><input type="submit" name="Add advertisement" value="Post Advertisement"></p>
-    </form>
-<h2>Previous advertisements</h2>
-        <form action="/advertisement" method="POST">
+        <p><input type="submit" name="Add advertisement" value="Post Advertisement"/></p>
+
+<h2>Previous Advertisements</h2>
+
         <table border="1">
         <tr>
             <th>Title</th>
