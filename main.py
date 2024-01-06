@@ -36,14 +36,14 @@ def register():
         conn.commit()
         conn.close()
         return redirect(url_for('register_success'))
-    else:
-        conn = sqlite3.connect("adv.db")
-        c = conn.cursor()
-        c.execute("SELECT username FROM User")
-        names = c.fetchall()
-        names = [name[0] for name in names]
-        conn.close()
-        return render_template('register.html', unames=names)
+
+    conn = sqlite3.connect("adv.db")
+    c = conn.cursor()
+    c.execute("SELECT username FROM User")
+    names = c.fetchall()
+    names = [name[0] for name in names]
+    conn.close()
+    return render_template('register.html', unames=names)
 
 
 @app.route("/register_success")
@@ -239,6 +239,7 @@ def loadprofile():
         c = conn.cursor()
         c.execute("UPDATE User SET username = ?, password = ?, fullname = ?, email = ?, telno = ? WHERE username = ?",
                   (username, password, fullname, email, tel, session["username"]))
+        c.execute("UPDATE Advertisement SET username=? WHERE username=?",(username,session["username"]))
         conn.commit()
         conn.close()
         session["username"] = username

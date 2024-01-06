@@ -6,7 +6,10 @@ function validate(unames)
     var alert = document.getElementById("msg");
     var successAlert = document.getElementById("success");
     // Clear success message if present
-    successAlert.innerHTML = "";
+    if(successAlert != null)
+    {
+        successAlert.innerHTML = "";
+    }
     // want to perform these checks
     // the password should include at least one
     //upper case letter, one lower case letter, one digit and one of these symbols [+, !, *, -] and its length
