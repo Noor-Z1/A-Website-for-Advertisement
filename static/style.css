@@ -26,3 +26,9 @@ input {
 form{
     text-align: center;
 }
+#msg, #error{
+    color: red;
+}
+#success{
+    color: green;
+}

@@ -224,11 +224,9 @@ def toggle():
     return redirect(url_for('advertisement'))
 
 
-
-
-
 @app.route("/editprofile", methods=['GET', 'POST'])
 def loadprofile():
+    success_msg = None #make sure the message is empty at first
     if request.method == 'POST':
         # update the database with the new details
         username = request.form["username"]
@@ -244,18 +242,22 @@ def loadprofile():
         conn.commit()
         conn.close()
         session["username"] = username
-        return redirect(url_for('loadprofile'))
-    else:
-        conn = sqlite3.connect("adv.db")
-        c = conn.cursor()
-        c.execute("SELECT * FROM User WHERE username = ?", (session["username"],))
-        profile = c.fetchall()
-        c.execute("SELECT username FROM User")
-        unames = c.fetchall()
-        unames = [name[0] for name in unames if name[0] != session["username"]]
+        success_msg = "Edit has been done successfully!"
+        return redirect(url_for('loadprofile',success_msg=success_msg))
 
-        conn.close()
-        return render_template('profile.html',  details=profile[0], unames=unames)
+    # get the success message to be displayed
+    success_msg = request.args.get('success_msg')
+
+    conn = sqlite3.connect("adv.db")
+    c = conn.cursor()
+    c.execute("SELECT * FROM User WHERE username = ?", (session["username"],))
+    profile = c.fetchall()
+    c.execute("SELECT username FROM User")
+    unames = c.fetchall()
+    unames = [name[0] for name in unames if name[0] != session["username"]]
+
+    conn.close()
+    return render_template('profile.html',  details=profile[0], unames=unames,success_msg=success_msg)
 
 # @app.post("/editprofile")
 # def editprofile():

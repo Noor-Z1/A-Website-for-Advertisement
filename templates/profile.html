@@ -17,9 +17,10 @@
           <p>Telephone number: <input type="tel" name="Telephone number" value="{{ details[4] }}" required="required"/></p>
           <p><input type="submit" value="Edit details"></p>
           <p id="msg"></p>
-          {% if msg %}
-             <p>{{ msg }}</p>
-          {% endif %}
+
+        {% if success_msg %}
+            <p id="success">{{ success_msg }}</p>
+        {% endif %}
       </form>
 </body>
 </html>
