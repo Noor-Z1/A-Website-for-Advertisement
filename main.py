@@ -51,7 +51,6 @@ def showadvertisements():
 
     conn = sqlite3.connect("adv.db")
     c = conn.cursor()
-
     c.execute("SELECT * FROM CATEGORY")
     categories = c.fetchall()
 
@@ -60,25 +59,27 @@ def showadvertisements():
         # search for a match The advertisement whose titles, descriptions or contact full name includes at least one of the
         # keywords will be listed. Please note that it does not have to be a full match, so if the keyword is
         # "abc", and the title is "xyabcz", then it should be listed as well
-        c.execute("SELECT * FROM Advertisement WHERE category = ?", selected)
+
+        c.execute("SELECT * FROM Advertisement WHERE isactive = 1 and category = ?", selected)
         allData = c.fetchall()
         c.execute("SELECT cname from CATEGORY where cid = ?", selected)
         category_name = c.fetchone()[0]  # extracting the name from the tuple
         filtered = []
 
+        # Create a regular expression pattern for the keyword
+        pattern = re.compile(keyword, re.IGNORECASE)
+        # Check if the pattern matches any part of AN ACTIVE advertisement
         for row in allData:
-            # Create a regular expression pattern for the keyword
-            pattern = re.compile(keyword, re.IGNORECASE)
             # Check if the pattern matches any part of AN ACTIVE advertisement
-            if (pattern.search(row[1]) or pattern.search(row[2]) or pattern.search(row[4])) and row[3]:
+            if (pattern.search(row[1]) or pattern.search(row[2]) or pattern.search(row[4])):
                 filtered.append(row)
 
         if filtered == [] or allData == []:
             msg = "No advertisement found!"
-        return render_template("home.html", data=allData, msg=msg, type=category_name, categories=categories, session=session)
+        return render_template("home.html", data=filtered, msg=msg, type=category_name, categories=categories, session=session)
 
     else:
-        c.execute("SELECT * FROM Advertisement")
+        c.execute("SELECT * FROM Advertisement where isactive = 1")
         allData = c.fetchall()
 
         # create a dictionary with all the categories as keys
@@ -86,11 +87,12 @@ def showadvertisements():
         for category in categories:
             mydict[category[1]] = []
 
+        # Create a regular expression pattern for the keyword
+        pattern = re.compile(keyword, re.IGNORECASE)
+
         for row in allData:
-            # Create a regular expression pattern for the keyword
-            pattern = re.compile(keyword, re.IGNORECASE)
             # Check if the pattern matches any part of AN ACTIVE advertisement
-            if (pattern.search(row[1]) or pattern.search(row[2]) or pattern.search(row[4])) and row[3]:
+            if (pattern.search(row[1]) or pattern.search(row[2]) or pattern.search(row[4])):
                 c.execute("SELECT cname from CATEGORY where cid = ?", (row[5],))
                 name = c.fetchone()[0]
                 mydict[name].append(row)
