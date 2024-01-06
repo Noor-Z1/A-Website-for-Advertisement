@@ -3,6 +3,7 @@ Assignment 3: A Website for Advertisement
 Team members: Noor Ul Zain 2528644 Shemin Samiei 2542389
 
 Version of Python used: 3.9
+Version of Python Flask: 3.0.0
 
 Operating System used: Windows
 
