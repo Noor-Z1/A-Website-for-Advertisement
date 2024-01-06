@@ -13,6 +13,12 @@ def home():
     session.pop("username",None)         # to make sure username is not in session keys yet!
     return render_template("home.html", session=session)
 
+@app.route("/back")
+def back():
+    if "username" in session:
+        return redirect(url_for('loginform'))
+    else:
+        return redirect(url_for('home'))
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -23,12 +29,6 @@ def register():
         email = request.form["Email address"]
         tel = request.form["Telephone number"]
 
-        # Check the duplication of the username
-        # if there is the same username in the database as she/he (not their own username) inputs:
-        if is_username_duplicated(username):
-            msg = "Username is already taken! please choose something else"
-            return render_template('register.html', msg=msg)
-
         conn = sqlite3.connect("adv.db")
         c = conn.cursor()
         c.execute("INSERT INTO User VALUES(?,?,?,?,?)",
@@ -37,7 +37,13 @@ def register():
         conn.close()
         return redirect(url_for('register_success'))
     else:
-        return render_template('register.html')
+        conn = sqlite3.connect("adv.db")
+        c = conn.cursor()
+        c.execute("SELECT username FROM User")
+        names = c.fetchall()
+        names = [name[0] for name in names]
+        conn.close()
+        return render_template('register.html', unames=names)
 
 
 @app.route("/register_success")
@@ -51,7 +57,6 @@ def showadvertisements():
 
     conn = sqlite3.connect("adv.db")
     c = conn.cursor()
-
     c.execute("SELECT * FROM CATEGORY")
     categories = c.fetchall()
 
@@ -60,25 +65,27 @@ def showadvertisements():
         # search for a match The advertisement whose titles, descriptions or contact full name includes at least one of the
         # keywords will be listed. Please note that it does not have to be a full match, so if the keyword is
         # "abc", and the title is "xyabcz", then it should be listed as well
-        c.execute("SELECT * FROM Advertisement WHERE category = ?", selected)
+
+        c.execute("SELECT * FROM Advertisement WHERE isactive = 1 and category = ?", selected)
         allData = c.fetchall()
         c.execute("SELECT cname from CATEGORY where cid = ?", selected)
         category_name = c.fetchone()[0]  # extracting the name from the tuple
         filtered = []
 
+        # Create a regular expression pattern for the keyword
+        pattern = re.compile(keyword, re.IGNORECASE)
+        # Check if the pattern matches any part of AN ACTIVE advertisement
         for row in allData:
-            # Create a regular expression pattern for the keyword
-            pattern = re.compile(keyword, re.IGNORECASE)
             # Check if the pattern matches any part of AN ACTIVE advertisement
-            if (pattern.search(row[1]) or pattern.search(row[2]) or pattern.search(row[4])) and row[3]:
+            if (pattern.search(row[1]) or pattern.search(row[2]) or pattern.search(row[4])):
                 filtered.append(row)
 
         if filtered == [] or allData == []:
             msg = "No advertisement found!"
-        return render_template("home.html", data=allData, msg=msg, type=category_name, categories=categories, session=session)
+        return render_template("home.html", data=filtered, msg=msg, type=category_name, categories=categories, session=session)
 
     else:
-        c.execute("SELECT * FROM Advertisement")
+        c.execute("SELECT * FROM Advertisement where isactive = 1")
         allData = c.fetchall()
 
         # create a dictionary with all the categories as keys
@@ -86,11 +93,12 @@ def showadvertisements():
         for category in categories:
             mydict[category[1]] = []
 
+        # Create a regular expression pattern for the keyword
+        pattern = re.compile(keyword, re.IGNORECASE)
+
         for row in allData:
-            # Create a regular expression pattern for the keyword
-            pattern = re.compile(keyword, re.IGNORECASE)
             # Check if the pattern matches any part of AN ACTIVE advertisement
-            if (pattern.search(row[1]) or pattern.search(row[2]) or pattern.search(row[4])) and row[3]:
+            if (pattern.search(row[1]) or pattern.search(row[2]) or pattern.search(row[4])):
                 c.execute("SELECT cname from CATEGORY where cid = ?", (row[5],))
                 name = c.fetchone()[0]
                 mydict[name].append(row)
@@ -161,8 +169,9 @@ def advertisement():
     c = conn.cursor()
 
     # fetch these for displaying the current records
-    c.execute("SELECT aid, title, description, category, isactive  FROM Advertisement WHERE username=?",
-              (session["username"],))
+    # joining advertisement and category table to get the  name of the category to be displayed in the table (not the id)
+    c.execute("SELECT aid, title, description, cname, isactive  FROM Advertisement JOIN Category "
+              "ON category=cid WHERE username=?", (session["username"],))
     records = c.fetchall()
 
     # need to display categories in a combo box so need to send these
@@ -215,53 +224,59 @@ def toggle():
     return redirect(url_for('advertisement'))
 
 
-@app.route('/loadprofile')
+
+
+
+@app.route("/editprofile", methods=['GET', 'POST'])
 def loadprofile():
-    conn = sqlite3.connect("adv.db")
-    c = conn.cursor()
-    c.execute("SELECT * FROM User WHERE username = ?", (session["username"],))
-    profile = c.fetchall()
-    conn.close()
-    msg = ""
-    session["profile"] = profile[0]
-    return render_template('profile.html',  details=profile[0], msg=msg)
+    if request.method == 'POST':
+        # update the database with the new details
+        username = request.form["username"]
+        password = request.form["pwd"]
+        fullname = request.form["Full name"]
+        email = request.form["Email address"]
+        tel = request.form["Telephone number"]
 
-@app.post("/editprofile")
-def editprofile():
+        conn = sqlite3.connect("adv.db")
+        c = conn.cursor()
+        c.execute("UPDATE User SET username = ?, password = ?, fullname = ?, email = ?, telno = ? WHERE username = ?",
+                  (username, password, fullname, email, tel, session["username"]))
+        conn.commit()
+        conn.close()
+        session["username"] = username
+        return redirect(url_for('loadprofile'))
+    else:
+        conn = sqlite3.connect("adv.db")
+        c = conn.cursor()
+        c.execute("SELECT * FROM User WHERE username = ?", (session["username"],))
+        profile = c.fetchall()
+        c.execute("SELECT username FROM User")
+        unames = c.fetchall()
+        unames = [name[0] for name in unames if name[0] != session["username"]]
 
-    # update the database with the new details
-    username = request.form["username"]
-    password = request.form["pwd"]
-    fullname = request.form["Full name"]
-    email = request.form["Email address"]
-    tel = request.form["Telephone number"]
+        conn.close()
+        return render_template('profile.html',  details=profile[0], unames=unames)
 
-    # Check the duplication of the username
-    # if the username that user inputs is not the same as the previous one
-    # and there is the same username in the database as she/he (not their own username) inputs:
-    if username != session["username"] and is_username_duplicated(username):
-        msg = "Username is already taken! please choose something else"
-        return render_template("profile.html", details=session["profile"], msg=msg)
-    # else there is no problem, we update the database accordingly
-    conn = sqlite3.connect("adv.db")
-    c = conn.cursor()
-    c.execute("UPDATE User SET username = ?, password = ?, fullname = ?, email = ?, telno = ? WHERE username = ?",
-              (username, password, fullname, email, tel, session["username"]))
-    conn.commit()
-    conn.close()
+# @app.post("/editprofile")
+# def editprofile():
+#
+#     # update the database with the new details
+#     username = request.form["username"]
+#     password = request.form["pwd"]
+#     fullname = request.form["Full name"]
+#     email = request.form["Email address"]
+#     tel = request.form["Telephone number"]
+#
+#     conn = sqlite3.connect("adv.db")
+#     c = conn.cursor()
+#     c.execute("UPDATE User SET username = ?, password = ?, fullname = ?, email = ?, telno = ? WHERE username = ?",
+#               (username, password, fullname, email, tel, session["username"]))
+#     conn.commit()
+#     conn.close()
+#
+#     session["username"] = username
+#     return redirect(url_for('loadprofile'))
 
-    session["username"] = username
-    return redirect(url_for('loadprofile'))
-
-
-def is_username_duplicated(username):
-    conn = sqlite3.connect("adv.db")
-    c = conn.cursor()
-    # here we count the number of users having the same username as the user inputs in the form (profile page)
-    c.execute("SELECT COUNT(*) FROM User WHERE username=?",(username,))
-    count = c.fetchone()[0]
-    conn.close()
-    return count > 0
 
 
 if __name__ == '__main__':

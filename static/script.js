@@ -1,7 +1,7 @@
 
-function validate()
+function validate(unames)
 {
-    // var name = document.getElementById("uname").value; # I deleted this and move the check to main in register and also profile
+    var name = document.getElementById("uname").value;
     var password = document.getElementById("pass").value;
     var alert = document.getElementById("msg");
 
@@ -10,6 +10,14 @@ function validate()
     //upper case letter, one lower case letter, one digit and one of these symbols [+, !, *, -] and its length
     //should be at least ten.
 
+    for (var i = 0; i < unames.length; i++)
+    {
+        if (unames[i] == name)
+        {
+            alert.innerHTML = "Username already exists";
+            return false;
+        }
+    }
 
     if (password.length < 10)
     {
@@ -40,8 +48,8 @@ function validate()
     else
     {
         alert.innerHTML = "";
+        return true;
     }
 
-//    document.submit();
     return true;
 }
