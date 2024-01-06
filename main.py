@@ -23,6 +23,12 @@ def register():
         email = request.form["Email address"]
         tel = request.form["Telephone number"]
 
+        # Check the duplication of the username
+        # if there is the same username in the database as she/he (not their own username) inputs:
+        if is_username_duplicated(username):
+            msg = "Username is already taken! please choose something else"
+            return render_template('register.html', msg=msg)
+
         conn = sqlite3.connect("adv.db")
         c = conn.cursor()
         c.execute("INSERT INTO User VALUES(?,?,?,?,?)",
@@ -31,13 +37,7 @@ def register():
         conn.close()
         return redirect(url_for('register_success'))
     else:
-        conn = sqlite3.connect("adv.db")
-        c = conn.cursor()
-        c.execute("SELECT username FROM User")
-        names = c.fetchall()
-        names = [name[0] for name in names]
-        conn.close()
-        return render_template('register.html', unames=names)
+        return render_template('register.html')
 
 
 @app.route("/register_success")
@@ -139,7 +139,6 @@ def login():
             session["username"] = username
             return render_template('home.html', session=session, categories=categories)
         else:
-            # added this because we need to show error message just below the form as per assignment!
             return render_template('login.html', msg="Wrong username or password!")
 
     elif "username" not in session:
@@ -185,7 +184,9 @@ def advertisement():
         conn.commit()
 
         # get updated records after inserting
-        c.execute("SELECT aid, title, description, category, isactive  FROM Advertisement WHERE username=?", (session["username"],))
+        # joining advertisement and category table to get the  name of the category to be displayed in the table (not the id)
+        c.execute("SELECT aid, title, description, cname, isactive  FROM Advertisement JOIN Category "
+                  "ON category=cid WHERE username=?", (session["username"],))
         records = c.fetchall()
         conn.close()
 
@@ -221,7 +222,9 @@ def loadprofile():
     c.execute("SELECT * FROM User WHERE username = ?", (session["username"],))
     profile = c.fetchall()
     conn.close()
-    return render_template('profile.html',  details=profile[0])
+    msg = ""
+    session["profile"] = profile[0]
+    return render_template('profile.html',  details=profile[0], msg=msg)
 
 @app.post("/editprofile")
 def editprofile():
@@ -233,6 +236,13 @@ def editprofile():
     email = request.form["Email address"]
     tel = request.form["Telephone number"]
 
+    # Check the duplication of the username
+    # if the username that user inputs is not the same as the previous one
+    # and there is the same username in the database as she/he (not their own username) inputs:
+    if username != session["username"] and is_username_duplicated(username):
+        msg = "Username is already taken! please choose something else"
+        return render_template("profile.html", details=session["profile"], msg=msg)
+    # else there is no problem, we update the database accordingly
     conn = sqlite3.connect("adv.db")
     c = conn.cursor()
     c.execute("UPDATE User SET username = ?, password = ?, fullname = ?, email = ?, telno = ? WHERE username = ?",
@@ -242,6 +252,16 @@ def editprofile():
 
     session["username"] = username
     return redirect(url_for('loadprofile'))
+
+
+def is_username_duplicated(username):
+    conn = sqlite3.connect("adv.db")
+    c = conn.cursor()
+    # here we count the number of users having the same username as the user inputs in the form (profile page)
+    c.execute("SELECT COUNT(*) FROM User WHERE username=?",(username,))
+    count = c.fetchone()[0]
+    conn.close()
+    return count > 0
 
 
 if __name__ == '__main__':

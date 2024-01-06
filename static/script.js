@@ -1,23 +1,15 @@
 
-function validate(unames)
+function validate()
 {
-    var name = document.getElementById("uname").value;
+    // var name = document.getElementById("uname").value; # I deleted this and move the check to main in register and also profile
     var password = document.getElementById("pass").value;
     var alert = document.getElementById("msg");
 
     // want to perform these checks
-    // The username should be unique for each person, and the password should include at least one
+    // the password should include at least one
     //upper case letter, one lower case letter, one digit and one of these symbols [+, !, *, -] and its length
     //should be at least ten.
 
-    for (var i = 0; i < unames.length; i++)
-    {
-        if (name == unames[i])
-        {
-            alert.innerHTML = "Username already exists";
-            return false;
-        }
-    }
 
     if (password.length < 10)
     {
