@@ -14,7 +14,7 @@
     <!--  Home Page | My Advertisements | My Profile | Logout  -->
         <p><a href="/dologin">Home Page</a> |
         <a href="/advertisement">My Advertisement</a> |
-        <a href="/loadprofile">My Profile</a> | <a href="/">Logout</a> </p>
+        <a href="/editprofile">My Profile</a> | <a href="/">Logout</a> </p>
 
         <form action="/showadvertisements" method="POST">
         <p>Search for active advertisements
@@ -32,7 +32,7 @@
     {% endif %}
 
     {% if msg!= "" or allData == [] %}
-     <p style="color: red;">{{ msg }}</p>
+     <p>{{ msg }}</p>
     {% elif data %}
     <p>{{ type }}: </p>
      <table border="1">
@@ -54,7 +54,7 @@
     {% else %}
        {% for keys in data_dict %}
          {% if data_dict[keys] == [] %}
-         <p style="color: red;">{{ keys }} : No Advertisements</p>
+         <p>{{ keys }} : No Advertisements</p>
          {% else %}
            <p>{{ keys }}: </p>
            <table border="1">
@@ -78,6 +78,5 @@
     {% endif %}
 
 </div>
-
 </body>
 </html>
