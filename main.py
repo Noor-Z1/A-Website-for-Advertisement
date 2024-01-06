@@ -161,8 +161,9 @@ def advertisement():
     c = conn.cursor()
 
     # fetch these for displaying the current records
-    c.execute("SELECT aid, title, description, category, isactive  FROM Advertisement WHERE username=?",
-              (session["username"],))
+    # joining advertisement and category table to get the  name of the category to be displayed in the table (not the id)
+    c.execute("SELECT aid, title, description, cname, isactive  FROM Advertisement JOIN Category "
+              "ON category=cid WHERE username=?", (session["username"],))
     records = c.fetchall()
 
     # need to display categories in a combo box so need to send these
